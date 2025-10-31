@@ -18,9 +18,60 @@ local function searchForLog()
     local success, data = turtle.inspect()
     if success and data.name and data.name:find("log") then
         print("Found log: " .. data.name)
-        return true
+        return true, data
     end
     return false
+end
+
+local function cutTree()
+    -- Cut the initial log
+    turtle.dig()
+    
+    -- Track movement for return journey
+    local upMoves = 0
+    local path = {}
+    
+    -- Cut trunk going up
+    while turtle.detectUp() do
+        turtle.digUp()
+        turtle.up()
+        upMoves = upMoves + 1
+        table.insert(path, "up")
+    end
+    
+    -- Check adjacent blocks at each level
+    local function checkAdjacent()
+        for _ = 1, 4 do
+            turtle.turnLeft()
+            if turtle.detect() then
+                turtle.dig()
+            end
+        end
+    end
+    
+    -- Check top level
+    checkAdjacent()
+    
+    -- Return to base and check each level
+    for _ = 1, upMoves do
+        turtle.down()
+        table.insert(path, "down")
+        checkAdjacent()
+    end
+    
+    -- Return to starting position and orientation
+    for _, move in ipairs(path) do
+        if move == "up" then
+            turtle.down()
+        elseif move == "down" then
+            turtle.up()
+        end
+    end
+    
+    -- Reset orientation to face original direction
+    for _ = 1, 4 do
+        turtle.turnLeft()
+    end
 end
 
 local function searchSquare(size)
@@ -30,7 +81,9 @@ local function searchSquare(size)
     local turn_count = 0
 
     for _ = 1, size * size do
-        if searchForLog() then
+        local found, data = searchForLog()
+        if found then
+            cutTree()
             return
         end
 
