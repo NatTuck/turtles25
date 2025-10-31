@@ -30,6 +30,9 @@ local function searchSquare(size)
                 return
             end
             if j < size then
+                if searchForLog() then
+                    return
+                end
                 if not turtle.forward() then
                     print("Cannot move forward, stopping.")
                     return
@@ -38,6 +41,9 @@ local function searchSquare(size)
         end
         if i < size then
             turtle.turnRight()
+            if searchForLog() then
+                return
+            end
             if not turtle.forward() then
                 print("Cannot move forward, stopping.")
                 return
@@ -45,6 +51,9 @@ local function searchSquare(size)
             turtle.turnRight()
             for k = 1, size do
                 if k < size then
+                    if searchForLog() then
+                        return
+                    end
                     if not turtle.forward() then
                         print("Cannot move forward, stopping.")
                         return
