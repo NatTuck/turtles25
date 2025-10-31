@@ -24,45 +24,43 @@ local function searchForLog()
 end
 
 local function searchSquare(size)
-    for i = 1, size do
-        for j = 1, size do
-            if searchForLog() then
-                return
-            end
-            if j < size then
-                if searchForLog() then
-                    return
-                end
-                if not turtle.forward() then
-                    print("Cannot move forward, stopping.")
-                    return
-                end
+    local x, y = 0, 0
+    local dx, dy = 1, 0
+    local steps = 1
+    local turn_count = 0
+
+    for _ = 1, size * size do
+        if searchForLog() then
+            return
+        end
+
+        if x + dx >= size or x + dx < 0 or y + dy >= size or y + dy < 0 or turn_count >= steps then
+            turtle.turnRight()
+            turn_count = 0
+            if dx == 1 then
+                dy = 1
+                dx = 0
+            elseif dy == 1 then
+                dx = -1
+                dy = 0
+            elseif dx == -1 then
+                dy = -1
+                dx = 0
+            elseif dy == -1 then
+                dx = 1
+                dy = 0
+                steps = steps + 1
             end
         end
-        if i < size then
-            turtle.turnRight()
-            if searchForLog() then
-                return
-            end
-            if not turtle.forward() then
-                print("Cannot move forward, stopping.")
-                return
-            end
-            turtle.turnRight()
-            for k = 1, size do
-                if k < size then
-                    if searchForLog() then
-                        return
-                    end
-                    if not turtle.forward() then
-                        print("Cannot move forward, stopping.")
-                        return
-                    end
-                end
-            end
-            turtle.turnRight()
-            turtle.turnRight()
+
+        if not turtle.forward() then
+            print("Cannot move forward, stopping.")
+            return
         end
+
+        x = x + dx
+        y = y + dy
+        turn_count = turn_count + 1
     end
 end
 
